@@ -89,7 +89,7 @@ async def check_raw_url_content(github_url: str = PathParam(..., title="GitHub U
         return {"raw_url": None, "github_path": None}
 
 
-@app.get("/view/{github_path:path}", response_class=HTMLResponse)
+@app.get("/{github_path:path}", response_class=HTMLResponse)
 async def view_markdown(request: Request, github_path: str) -> HTMLResponse:
     """
     View GitHub markdown content.
@@ -128,8 +128,34 @@ async def view_markdown(request: Request, github_path: str) -> HTMLResponse:
                 "error.html", {"request": request, "message": f"Failed to fetch content: HTTP {response.status_code}"}
             )
 
+        file_name = github_path.split("/")[-1] if "/" in github_path else github_path
+
         # Get file information
-        content = response.text.replace("`", r"\`")
+        content = response.text
+
+        if file_name.endswith(".py"):
+            content = content.replace("```", "'''")
+            content = f"```python\n{content}\n```"
+        elif file_name.endswith(".sh"):
+            content = f"```bash\n{content}\n```"
+        elif file_name.endswith(".yaml") or file_name.endswith(".yml"):
+            content = f"```yaml\n{content}\n```"
+        elif file_name.endswith(".json"):
+            content = f"```json\n{content}\n```"
+        elif file_name.endswith(".toml"):
+            content = f"```toml\n{content}\n```"
+        elif file_name.endswith(".xml"):
+            content = f"```xml\n{content}\n```"
+        elif file_name.endswith(".html"):
+            content = f"```html\n{content}\n```"
+        elif file_name.endswith(".css"):
+            content = f"```css\n{content}\n```"
+        elif file_name.endswith(".js"):
+            content = f"```javascript\n{content}\n```"
+        elif file_name.endswith(".sql"):
+            content = f"```sql\n{content}\n```"
+
+        content = content.replace("`", r"\`")
 
         # Convert relative path into content to github absolute path
         content = convert_markdown_links_to_absolute(content, normalized_url)
@@ -139,9 +165,7 @@ async def view_markdown(request: Request, github_path: str) -> HTMLResponse:
 
         # Convert GitHub markdown links to inner links
         base_url = str(request.base_url)
-        content = convert_markdown_github_link_to_inner_link(content, f"{base_url}view")
-
-        file_name = github_path.split("/")[-1] if "/" in github_path else github_path
+        content = convert_markdown_github_link_to_inner_link(content, f"{base_url}")
 
         # Render the markdown template
         return templates.TemplateResponse(
