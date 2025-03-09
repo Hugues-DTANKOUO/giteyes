@@ -599,11 +599,10 @@
             function slugify(text) {
                 return text
                     .toLowerCase()
-                    .replace(/[^\w\s-]/g, '')    // Remove special characters
-                    .replace(/\s+/g, '-')        // Replace spaces with hyphens
-                    .replace(/--+/g, '-')        // Replace multiple hyphens
-                    .replace(/^-+/, '')          // Remove leading hyphens
-                    .replace(/-+$/, '');         // Remove trailing hyphens
+                    .replace(/\s+/g, '-')               // Replace spaces with hyphens
+                    .replace(/[^\p{L}\p{N}-]/gu, '')    // Remove special characters except hyphens
+                    .replace(/--+/g, '-')               // Replace multiple hyphens
+                    .replace(/^-+|-+$/g, '');           // Remove leading and trailing hyphens
             }
 
             // Initialize markdown-it with plugins

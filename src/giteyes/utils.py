@@ -241,8 +241,8 @@ def convert_markdown_links_to_absolute(content: str, github_path: str) -> str:
     dir_path = "/".join(path_parts[:-1])
 
     # Define a regex pattern to find all markdown links
-    # Capture all paths inside parentheses
-    pattern = r"\]\(([^)]+)\)"
+    # Capture all paths inside parentheses, but ignore links that start with #
+    pattern = r"\]\(([^#][^)]*)\)"
 
     def replace_link(match: re.Match[str]) -> str:
         """
