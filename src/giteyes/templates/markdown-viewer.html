@@ -20,6 +20,8 @@
     
     <!-- Markdown-it -->
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     
     <!-- Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
@@ -549,7 +551,14 @@
                     return ''; // use external default escaping
                 }
             })
-            .use(window.markdownitEmoji);
+            .use(window.markdownitEmoji)
+            .use(markdownItMermaid);
+
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                securityLevel: 'loose'
+            });
             
             // Get DOM elements
             const markdownContent = document.getElementById('markdown-content');
@@ -614,6 +623,18 @@
                 if (currentPath === '/') {
                     document.getElementById('nav-home').classList.add('active');
                 }
+            }
+
+            function markdownItMermaid(md) {
+                const fence = md.renderer.rules.fence.bind(md.renderer.rules);
+                
+                md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
+                    const token = tokens[idx];
+                    if (token.info === 'mermaid') {
+                    return `<div class="mermaid">${token.content}</div>`;
+                    }
+                    return fence(tokens, idx, options, env, slf);
+                };
             }
             
             // Set active link
