@@ -9,6 +9,20 @@
     <meta name="description" content="Transform GitHub documentation into an interactive book-like reading experience">
     <meta name="keywords" content="github, documentation, reader, markdown, book">
     <meta name="author" content="Hugues DTANKOUO">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.base_url }}{{ request.url.path }}">
+    <meta property="og:title" content="{% block og_title %}GitEyes - Interactive GitHub Documentation Reader{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Transform GitHub documentation into an interactive book-like reading experience{% endblock %}">
+    <meta property="og:image" content="/static/images/giteyes-preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.base_url }}{{ request.url.path }}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.og_title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.og_description() }}{% endblock %}">
+    <meta name="twitter:image" content="/static/images/giteyes-preview.png">
     
     <!-- Favicon -->
     <link rel="icon" href="/static/images/favicon.png" type="image/png">
