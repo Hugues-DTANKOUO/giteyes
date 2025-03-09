@@ -21,7 +21,7 @@ GitEyes propose :
 
 Essayez de consulter cette ressource populaire d'Ingénierie des Données avec GitEyes pour une expérience de lecture plus confortable :
 
-[Data Engineering Cookbook par Andreas Kretz](http://127.0.0.1:8000/view/andkret/Cookbook/blob/master/README.md)
+[Data Engineering Cookbook par Andreas Kretz](http://127.0.0.1:8000/andkret/Cookbook/blob/master/README.md)
 
 ## ⚙️ Implémentation Actuelle
 
