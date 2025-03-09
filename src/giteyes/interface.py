@@ -1,3 +1,5 @@
+import os
+
 from pathlib import Path
 
 import requests
@@ -28,6 +30,9 @@ app.mount("/static", StaticFiles(directory=CURRENT_DIR / "static"), name="static
 
 
 templates = Jinja2Templates(directory=CURRENT_DIR / "templates")
+
+
+port = int(os.environ.get("PORT", 8000))
 
 
 @app.get("/docs")

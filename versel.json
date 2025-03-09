@@ -1,0 +1,22 @@
+{
+    "builds": [
+      {
+        "src": "src/giteyes/interface.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "src/giteyes/static/**",
+        "use": "@vercel/static"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/static/(.*)",
+        "dest": "src/giteyes/static/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "src/giteyes/interface.py"
+      }
+    ]
+  }
