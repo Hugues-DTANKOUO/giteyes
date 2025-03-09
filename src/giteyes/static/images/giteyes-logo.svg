@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <!-- Background Circle -->
+  <circle cx="250" cy="250" r="240" fill="#1E293B" />
+  <circle cx="250" cy="250" r="220" fill="#0F172A" />
+  
+  <!-- Eye Outer Circle -->
+  <circle cx="250" cy="250" r="160" fill="#334155" />
+  
+  <!-- Eye Iris -->
+  <circle cx="250" cy="250" r="120" fill="#3B82F6" />
+  <circle cx="250" cy="250" r="110" fill="#1D4ED8" />
+  
+  <!-- Eye Pupil -->
+  <circle cx="250" cy="250" r="60" fill="#0F172A" />
+  
+  <!-- Eye Highlight -->
+  <circle cx="300" cy="200" r="30" fill="#ffffff" />
+  <circle cx="220" cy="220" r="15" fill="#ffffff" opacity="0.6" />
+  
+  <!-- Code Branch Lines (representing Git) -->
+  <g stroke="#60A5FA" stroke-width="12" stroke-linecap="round">
+    <!-- Main branch -->
+    <path d="M 130,130 L 370,370" fill="none" />
+    
+    <!-- Fork branch -->
+    <path d="M 250,250 L 370,130" fill="none" />
+    
+    <!-- Connection dots -->
+    <circle cx="130" cy="130" r="15" fill="#60A5FA" />
+    <circle cx="250" cy="250" r="15" fill="#60A5FA" />
+    <circle cx="370" cy="130" r="15" fill="#60A5FA" />
+    <circle cx="370" cy="370" r="15" fill="#60A5FA" />
+  </g>
+</svg>

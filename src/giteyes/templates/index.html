@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitEyes - Interactive GitHub Documentation Reader</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Transform GitHub documentation into an interactive book-like reading experience">
+    <meta name="keywords" content="github, documentation, reader, markdown, book">
+    <meta name="author" content="Hugues DTANKOUO">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/static/images/favicon.png" type="image/png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #4b5563;
+            --accent-color: #3b82f6;
+            --background-color: #f8fafc;
+            --card-color: #ffffff;
+            --text-color: #1f2937;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --rounded-sm: 0.25rem;
+            --rounded-md: 0.375rem;
+            --rounded-lg: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark mode styles */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #111827;
+                --card-color: #1f2937;
+                --text-color: #f9fafb;
+                --secondary-color: #9ca3af;
+                --border-color: #374151;
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+                --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--card-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--rounded-md);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .github-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .github-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 4rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            text-align: center;
+            color: var(--secondary-color);
+            max-width: 600px;
+            margin-bottom: 3rem;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 2rem;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--rounded-lg);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .search-button {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--rounded-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .search-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Result Box */
+        .result-container {
+            width: 100%;
+            max-width: 700px;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        .result-box {
+            padding: 1.5rem;
+            border-radius: var(--rounded-lg);
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .result-box.error {
+            border-color: var(--error-color);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .result-box.success {
+            border-color: var(--success-color);
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .result-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-title.error {
+            color: var(--error-color);
+        }
+
+        .result-title.success {
+            color: var(--success-color);
+        }
+
+        .result-link {
+            display: block;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: var(--rounded-md);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .result-link:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            margin: 0 auto;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-top: 5rem;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            border-radius: var(--rounded-lg);
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            color: var(--secondary-color);
+            font-size: 0.9375rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--card-color);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-text {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .footer-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.125rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-input {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animated waves */
+        .waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh;
+            min-height: 100px;
+            max-height: 150px;
+            z-index: -1;
+        }
+
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            animation-duration: 7s;
+            fill: rgba(59, 130, 246, 0.1);
+        }
+
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 10s;
+            fill: rgba(59, 130, 246, 0.2);
+        }
+
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 13s;
+            fill: rgba(59, 130, 246, 0.3);
+        }
+
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+            fill: rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes move-forever {
+            0% {
+                transform: translate3d(-90px, 0, 0);
+            }
+            100% { 
+                transform: translate3d(85px, 0, 0);
+            }
+        }
+
+        /* Error and success icons */
+        .icon-error, .icon-success {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon-error {
+            color: var(--error-color);
+        }
+
+        .icon-success {
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">👁️</span>
+                <span class="logo-text">GitEyes</span>
+            </a>
+            <a href="https://github.com/Hugues-DTANKOUO/giteyes" target="_blank" class="github-link">
+                <svg viewBox="0 0 24 24" class="github-icon">
+                    <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+                View on GitHub
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <h1>Transform GitHub Documentation Into Interactive Books</h1>
+            <p class="subtitle">Enter a GitHub repository URL to get started. You can use absolute or relative URLs.</p>
+
+            <div class="search-container">
+                <form class="search-form" id="githubForm">
+                    <div class="search-input-wrapper">
+                        <input type="text" class="search-input" id="githubUrl" placeholder="e.g., https://github.com/Hugues-DTANKOUO/giteyes/blob/main/README.md" required>
+                    </div>
+                    <button type="submit" class="search-button">Get Raw Content</button>
+                </form>
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="result-box" id="resultBox">
+                    <div class="result-title" id="resultTitle">
+                        <span id="resultIcon"></span>
+                        <span id="resultTitleText">Result</span>
+                    </div>
+                    <p id="resultMessage"></p>
+                    <a href="#" class="result-link" id="resultLink" target="_blank" style="display: none;">View Raw Content</a>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <h2 class="section-title">Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <h3 class="feature-title">Document Transformation</h3>
+                        <p class="feature-description">Convert GitHub repositories into beautifully formatted, readable documentation with proper navigation and structure.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="feature-title">Search Functionality</h3>
+                        <p class="feature-description">Easily search through repository content to find exactly what you're looking for, across multiple files and directories.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌓</div>
+                        <h3 class="feature-title">Reading Preferences</h3>
+                        <p class="feature-description">Customize your reading experience with dark/light mode, adjustable font sizes, and distraction-free layout options.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waves animation -->
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" />
+                <use xlink:href="#gentle-wave" x="48" y="3" />
+                <use xlink:href="#gentle-wave" x="48" y="5" />
+                <use xlink:href="#gentle-wave" x="48" y="7" />
+            </g>
+        </svg>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-text">
+                &copy; 2025 GitEyes. Created by <a href="https://github.com/Hugues-DTANKOUO" class="footer-link" target="_blank">Hugues DTANKOUO</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('githubForm');
+            const urlInput = document.getElementById('githubUrl');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultTitleText = document.getElementById('resultTitleText');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultMessage = document.getElementById('resultMessage');
+            const resultLink = document.getElementById('resultLink');
+
+            // Frontend validation function
+            function isValidGitHubUrl(url) {
+                // Basic GitHub URL pattern check
+                const githubUrlPattern = /^(?:(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:blob|tree)\/([a-zA-Z0-9_.-]+)(?:\/(.*))?)?|^\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_.-]+)(?:\/(?:blob|tree)\/([a-zA-Z0-9_.-]+)(?:\/(.*))?)?)/;
+                return githubUrlPattern.test(url);
+            }
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get the GitHub URL
+                let url = urlInput.value.trim();
+                
+                // Perform frontend validation
+                if (!isValidGitHubUrl(url)) {
+                    // Show error without making API request
+                    resultContainer.style.display = 'block';
+                    resultBox.className = 'result-box error';
+                    resultTitle.className = 'result-title error';
+                    resultTitleText.textContent = 'Invalid GitHub URL';
+                    resultIcon.innerHTML = '<svg class="icon-error" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                    resultMessage.textContent = 'The URL format is invalid. Please enter a valid GitHub URL like "github.com/username/repo/blob/branch/file.ext".';
+                    resultLink.style.display = 'none';
+                    return;
+                }
+                
+                // Add leading slash for relative URLs if missing
+                if (!url.startsWith('/') && !url.startsWith('http')) {
+                    url = '/' + url;
+                }
+                
+                // Show loading spinner
+                loadingSpinner.style.display = 'block';
+                resultContainer.style.display = 'none';
+                
+                try {
+                    // Make API request
+                    const response = await fetch(`/check-raw-url-content/${encodeURIComponent(url)}`, {
+                        method: 'POST'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Show result container
+                    resultContainer.style.display = 'block';
+                    
+                    if (data.raw_url) {
+                        // Success case
+                        resultBox.className = 'result-box success';
+                        resultTitle.className = 'result-title success';
+                        resultTitleText.textContent = 'Valid GitHub URL';
+                        resultIcon.innerHTML = '<svg class="icon-success" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+                        
+                        // Display the original URL and raw URL
+                        resultMessage.innerHTML = `
+                            <p>Raw content is available for this GitHub URL.</p>
+                            <p style="margin-top: 8px;"><strong>Original URL:</strong> <span style="word-break: break-all;">${url}</span></p>
+                        `;
+                        
+                        // Extract github_path from response
+                        const githubPath = data.github_path || url;
+                        
+                        // Add link to view markdown content
+                        const viewLink = document.createElement('a');
+                        // Don't encode the entire path, as the "/view/" route already expects a path parameter
+                        // Instead, just make sure we're using the normalized path from the API
+                        viewLink.href = `/view/${githubPath}`;
+                        viewLink.className = 'result-link';
+                        viewLink.style.marginBottom = '10px';
+                        viewLink.style.backgroundColor = '#2563eb';
+                        viewLink.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" style="margin-right: 8px;">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            View Document
+                        `;
+                        
+                        // Insert view link before the raw link
+                        resultBox.insertBefore(viewLink, resultLink);
+                        
+                        resultLink.href = data.raw_url;
+                        resultLink.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" style="margin-right: 8px;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            View Raw Content
+                        `;
+                        resultLink.style.display = 'block';
+                    } else {
+                        // Error case
+                        resultBox.className = 'result-box error';
+                        resultTitle.className = 'result-title error';
+                        resultTitleText.textContent = 'Invalid GitHub URL';
+                        resultIcon.innerHTML = '<svg class="icon-error" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                        resultMessage.textContent = 'The URL is invalid or does not point to a file that can be viewed as raw content. Make sure it follows the format: github.com/username/repo/blob/branch/path/to/file.';
+                        resultLink.style.display = 'none';
+                    }
+                } catch (error) {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Show error
+                    resultContainer.style.display = 'block';
+                    resultBox.className = 'result-box error';
+                    resultTitle.className = 'result-title error';
+                    resultTitleText.textContent = 'Error';
+                    resultIcon.innerHTML = '<svg class="icon-error" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+                    resultMessage.textContent = 'An error occurred while processing your request. Please try again.';
+                    resultLink.style.display = 'none';
+                }
+            });
+
+            // Support Enter key in input field
+            urlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
