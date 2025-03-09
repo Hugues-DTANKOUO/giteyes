@@ -12,7 +12,6 @@ python = "^3.10"
 fastapi = {extras = ["standard"], version = "^0.115.6"}
 gunicorn = "^23.0.0"
 poetry-plugin-export = "^1.9.0"
-types-requests = "^2.32.0.20250306"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -20,6 +19,7 @@ mypy = "^1.9.0"
 ruff = "^0.3.2"
 pytest-cov = "^6.0.0"
 pytest-asyncio = "^0.25.3"
+types-requests = "^2.32.0.20250306"
 
 [build-system]
 requires = ["poetry-core"]

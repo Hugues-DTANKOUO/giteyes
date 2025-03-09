@@ -639,12 +639,18 @@
                         
                         // Extract github_path from response
                         const githubPath = data.github_path || url;
+
+                        // Remove existing view buttons
+                        const existingViewButtons = resultBox.querySelectorAll('a.result-link:not(#resultLink)');
+                        existingViewButtons.forEach(button => {
+                            button.remove();
+                        });
                         
                         // Add link to view markdown content
                         const viewLink = document.createElement('a');
-                        // Don't encode the entire path, as the "/view/" route already expects a path parameter
+                        // Don't encode the entire path, as the "/" route already expects a path parameter
                         // Instead, just make sure we're using the normalized path from the API
-                        viewLink.href = `/view/${githubPath}`;
+                        viewLink.href = `/${githubPath}`;
                         viewLink.className = 'result-link';
                         viewLink.style.marginBottom = '10px';
                         viewLink.style.backgroundColor = '#2563eb';
