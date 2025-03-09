@@ -29,7 +29,9 @@
     
     <!-- Load markdown-it plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it-emoji/2.0.2/markdown-it-emoji.min.js"></script>
-    <!-- Removed task-lists plugin due to MIME type issues -->
+
+    <!-- Add markdown-it-anchor plugin for heading IDs and permalinks -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-anchor@8.6.7/dist/markdown-it-anchor.min.js"></script>
     
     <style>
         /* Custom Theme - Dark Mode Only */
@@ -380,6 +382,42 @@
             background-color: rgba(0, 0, 0, 0.1);
         }
 
+        /* Styles for anchor links and targeted sections */
+        .header-anchor {
+            float: left;
+            margin-left: -0.87em;
+            padding-right: 0.23em;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        h1:hover .header-anchor,
+        h2:hover .header-anchor,
+        h3:hover .header-anchor,
+        h4:hover .header-anchor,
+        h5:hover .header-anchor,
+        h6:hover .header-anchor {
+            opacity: 1;
+        }
+
+        .markdown-content h1:target,
+        .markdown-content h2:target,
+        .markdown-content h3:target,
+        .markdown-content h4:target,
+        .markdown-content h5:target,
+        .markdown-content h6:target {
+            background-color: rgba(59, 130, 246, 0.1);
+            padding: 0.2em 0.5em;
+            border-radius: 0.3rem;
+            animation: target-fade 2s 1;
+        }
+
+        @keyframes target-fade {
+            0% { background-color: rgba(59, 130, 246, 0.3); }
+            100% { background-color: rgba(59, 130, 246, 0.1); }
+        }
+
         /* Footer */
         footer {
             background-color: var(--footer-bg);
@@ -537,6 +575,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            // Custom markdown-it plugin for Mermaid diagrams
+            function markdownItMermaid(md) {
+                const fence = md.renderer.rules.fence.bind(md.renderer.rules);
+                
+                md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
+                    const token = tokens[idx];
+                    if (token.info === 'mermaid') {
+                    return `<div class="mermaid">${token.content}</div>`;
+                    }
+                    return fence(tokens, idx, options, env, slf);
+                };
+            }
+
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                securityLevel: 'loose'
+            });
+
+            // Slugify function to convert headings to anchor-friendly IDs
+            function slugify(text) {
+                return text
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '')    // Remove special characters
+                    .replace(/\s+/g, '-')        // Replace spaces with hyphens
+                    .replace(/--+/g, '-')        // Replace multiple hyphens
+                    .replace(/^-+/, '')          // Remove leading hyphens
+                    .replace(/-+$/, '');         // Remove trailing hyphens
+            }
+
             // Initialize markdown-it with plugins
             const md = window.markdownit({
                 html: true,
@@ -554,11 +623,40 @@
             .use(window.markdownitEmoji)
             .use(markdownItMermaid);
 
-            mermaid.initialize({
-                startOnLoad: true,
-                theme: 'dark',
-                securityLevel: 'loose'
+            // Custom plugin to add IDs to headings
+            md.core.ruler.push('add_ids_to_headings', function(state) {
+                const tokens = state.tokens;
+                const headings = {};
+                
+                for (let i = 0; i < tokens.length; i++) {
+                    if (tokens[i].type === 'heading_open') {
+                        const heading = tokens[i + 1];
+                        if (heading && heading.type === 'inline' && heading.content) {
+                            const id = slugify(heading.content);
+                            // Handle duplicate IDs
+                            headings[id] = (headings[id] || 0) + 1;
+                            const uniqueId = headings[id] > 1 ? `${id}-${headings[id]}` : id;
+                            tokens[i].attrSet('id', uniqueId);
+                        }
+                    }
+                }
             });
+
+            // Try to use the anchor plugin if available
+            try {
+                if (window.markdownItAnchor) {
+                    md.use(window.markdownItAnchor, {
+                        slugify: slugify,
+                        permalink: true,
+                        permalinkSymbol: '#',
+                        permalinkClass: 'header-anchor',
+                        permalinkBefore: true,
+                        level: [1, 2, 3, 4, 5, 6]
+                    });
+                }
+            } catch (e) {
+                console.warn("Failed to use markdown-it-anchor plugin: ", e);
+            }
             
             // Get DOM elements
             const markdownContent = document.getElementById('markdown-content');
@@ -571,6 +669,22 @@
             // Apply syntax highlighting to code blocks
             document.querySelectorAll('pre code').forEach((block) => {
                 hljs.highlightBlock(block);
+            });
+
+            // Initialize mermaid diagrams
+            try {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            } catch (e) {
+                console.warn("Failed to initialize mermaid diagrams: ", e);
+            }
+
+            // Add manual IDs to any headings that didn't receive them
+            // This is a safety net in case the plugin doesn't work as expected
+            document.querySelectorAll('.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4, .markdown-content h5, .markdown-content h6').forEach((heading) => {
+                if (!heading.id) {
+                    const headingText = heading.textContent || '';
+                    heading.id = slugify(headingText);
+                }
             });
             
             // Copy button functionality
@@ -608,6 +722,36 @@
                     link.rel = 'noopener noreferrer';
                 }
             });
+
+            // Handle clicks on internal links
+            markdownContent.addEventListener('click', function(event) {
+                const target = event.target;
+                
+                // Check if it's a link
+                if (target.tagName === 'A') {
+                    const href = target.getAttribute('href');
+                    
+                    // Check if it's an internal anchor link
+                    if (href && href.startsWith('#')) {
+                        event.preventDefault();
+                        
+                        // Get the target element
+                        const anchorId = href.substring(1);
+                        const anchorElement = document.getElementById(anchorId);
+                        
+                        if (anchorElement) {
+                            // Scroll to the element
+                            anchorElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                            
+                            // Update URL without reloading the page
+                            history.pushState(null, null, href);
+                        }
+                    }
+                }
+            });
             
             // Handle active navigation
             function setActiveNavLink() {
@@ -625,16 +769,19 @@
                 }
             }
 
-            function markdownItMermaid(md) {
-                const fence = md.renderer.rules.fence.bind(md.renderer.rules);
-                
-                md.renderer.rules.fence = (tokens, idx, options, env, slf) => {
-                    const token = tokens[idx];
-                    if (token.info === 'mermaid') {
-                    return `<div class="mermaid">${token.content}</div>`;
+            // Process anchors on initial load
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const anchor = window.location.hash.substring(1);
+                    const anchorElement = document.getElementById(anchor);
+                    
+                    if (anchorElement) {
+                        anchorElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
                     }
-                    return fence(tokens, idx, options, env, slf);
-                };
+                }, 300); // Small delay to ensure content is rendered
             }
             
             // Set active link

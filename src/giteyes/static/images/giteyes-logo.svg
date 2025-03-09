@@ -1,34 +1,248 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
-  <!-- Background Circle -->
-  <circle cx="250" cy="250" r="240" fill="#1E293B" />
-  <circle cx="250" cy="250" r="220" fill="#0F172A" />
-  
-  <!-- Eye Outer Circle -->
-  <circle cx="250" cy="250" r="160" fill="#334155" />
-  
-  <!-- Eye Iris -->
-  <circle cx="250" cy="250" r="120" fill="#3B82F6" />
-  <circle cx="250" cy="250" r="110" fill="#1D4ED8" />
-  
-  <!-- Eye Pupil -->
-  <circle cx="250" cy="250" r="60" fill="#0F172A" />
-  
-  <!-- Eye Highlight -->
-  <circle cx="300" cy="200" r="30" fill="#ffffff" />
-  <circle cx="220" cy="220" r="15" fill="#ffffff" opacity="0.6" />
-  
-  <!-- Code Branch Lines (representing Git) -->
-  <g stroke="#60A5FA" stroke-width="12" stroke-linecap="round">
-    <!-- Main branch -->
-    <path d="M 130,130 L 370,370" fill="none" />
+  <!-- Definitions -->
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="85%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#0B1222" />
+    </radialGradient>
     
-    <!-- Fork branch -->
-    <path d="M 250,250 L 370,130" fill="none" />
+    <!-- Iris Gradient -->
+    <radialGradient id="irisGradient" cx="50%" cy="50%" r="50%" fx="45%" fy="45%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="70%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </radialGradient>
     
-    <!-- Connection dots -->
-    <circle cx="130" cy="130" r="15" fill="#60A5FA" />
-    <circle cx="250" cy="250" r="15" fill="#60A5FA" />
-    <circle cx="370" cy="130" r="15" fill="#60A5FA" />
-    <circle cx="370" cy="370" r="15" fill="#60A5FA" />
+    <!-- Book Cover Gradient -->
+    <linearGradient id="bookCoverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    
+    <!-- Page Gradient -->
+    <linearGradient id="pageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="100%" stop-color="#CBD5E1" />
+    </linearGradient>
+    
+    <!-- Glow Effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Code Path Gradient -->
+    <linearGradient id="codePathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    
+    <!-- Scanning Animation -->
+    <linearGradient id="scanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+      <stop offset="50%" stop-color="rgba(255,255,255,0.1)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+      <animate attributeName="y1" from="0%" to="100%" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="y2" from="100%" to="200%" dur="3s" repeatCount="indefinite" />
+    </linearGradient>
+    
+    <!-- Graduation Cap Pattern -->
+    <pattern id="graduationPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M20 5 L35 15 L20 25 L5 15 Z" fill="none" stroke="#60A5FA" stroke-width="1" opacity="0.2" />
+    </pattern>
+    
+    <!-- Book Pattern -->
+    <pattern id="bookPattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <rect x="5" y="10" width="50" height="40" rx="2" fill="none" stroke="#60A5FA" stroke-width="1" opacity="0.2" />
+      <line x1="30" y1="10" x2="30" y2="50" stroke="#60A5FA" stroke-width="1" opacity="0.2" />
+    </pattern>
+    
+    <!-- Knowledge Animation -->
+    <radialGradient id="knowledgeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(219, 234, 254, 0.3)">
+        <animate attributeName="stop-opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="rgba(219, 234, 254, 0)" />
+    </radialGradient>
+  </defs>
+
+  <!-- Main Background Circle -->
+  <circle cx="250" cy="250" r="240" fill="url(#bgGradient)" />
+  
+  <!-- Learning & Documentation Background Patterns -->
+  <circle cx="250" cy="250" r="220" fill="url(#graduationPattern)" opacity="0.15" />
+  <circle cx="250" cy="250" r="200" fill="url(#bookPattern)" opacity="0.15" />
+  
+  <!-- Stack of Books (Outside Eye, Bottom) -->
+  <g transform="translate(250, 250) rotate(-15)">
+    <!-- Book 1 (Bottom) -->
+    <g transform="translate(-120, 130)">
+      <rect x="-25" y="-7" width="50" height="14" rx="2" fill="#38BDF8" opacity="0.9" />
+      <rect x="-25" y="-10" width="50" height="3" rx="1" fill="#0EA5E9" opacity="0.8" />
+      <rect x="-20" y="-5" width="40" height="1" fill="white" opacity="0.5" />
+      <rect x="-20" y="-2" width="30" height="1" fill="white" opacity="0.5" />
+    </g>
+    
+    <!-- Book 2 (Middle) -->
+    <g transform="translate(-110, 117)">
+      <rect x="-30" y="-7" width="60" height="14" rx="2" fill="#818CF8" opacity="0.9" />
+      <rect x="-30" y="-10" width="60" height="3" rx="1" fill="#6366F1" opacity="0.8" />
+      <rect x="-25" y="-5" width="50" height="1" fill="white" opacity="0.5" />
+      <rect x="-25" y="-2" width="40" height="1" fill="white" opacity="0.5" />
+    </g>
+    
+    <!-- Book 3 (Top) -->
+    <g transform="translate(-115, 104)">
+      <rect x="-20" y="-7" width="40" height="14" rx="2" fill="#A78BFA" opacity="0.9" />
+      <rect x="-20" y="-10" width="40" height="3" rx="1" fill="#8B5CF6" opacity="0.8" />
+      <rect x="-15" y="-5" width="30" height="1" fill="white" opacity="0.5" />
+      <rect x="-15" y="-2" width="20" height="1" fill="white" opacity="0.5" />
+    </g>
   </g>
+  
+  <!-- Open Book (Outside Eye, Top Right) -->
+  <g transform="translate(340, 140) rotate(15)">
+    <!-- Book Spine -->
+    <rect x="-5" y="-25" width="10" height="50" rx="2" fill="#2563EB" />
+    <!-- Left Page -->
+    <path d="M-5,-25 C-15,-20 -30,-10 -30,0 C-30,10 -15,20 -5,25 Z" fill="url(#pageGradient)" />
+    <!-- Right Page -->
+    <path d="M5,-25 C15,-20 30,-10 30,0 C30,10 15,20 5,25 Z" fill="url(#pageGradient)" />
+    <!-- Text Lines on Pages (Left) -->
+    <g opacity="0.7">
+      <line x1="-25" y1="-15" x2="-10" y2="-15" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="-10" x2="-10" y2="-10" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="-5" x2="-10" y2="-5" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="0" x2="-10" y2="0" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="5" x2="-10" y2="5" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="10" x2="-10" y2="10" stroke="#334155" stroke-width="1" />
+      <line x1="-25" y1="15" x2="-10" y2="15" stroke="#334155" stroke-width="1" />
+    </g>
+    <!-- Text Lines on Pages (Right) -->
+    <g opacity="0.7">
+      <line x1="10" y1="-15" x2="25" y2="-15" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="-10" x2="25" y2="-10" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="-5" x2="25" y2="-5" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="0" x2="25" y2="0" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="5" x2="25" y2="5" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="10" x2="25" y2="10" stroke="#334155" stroke-width="1" />
+      <line x1="10" y1="15" x2="25" y2="15" stroke="#334155" stroke-width="1" />
+    </g>
+  </g>
+
+  <!-- Graduation Cap (Outside Eye, Left) -->
+  <g transform="translate(135, 150) rotate(-10)">
+    <!-- Cap Base -->
+    <rect x="-25" y="-5" width="50" height="10" rx="2" fill="#3B82F6" />
+    <!-- Cap Top -->
+    <path d="M-25,-5 L0,-20 L25,-5 Z" fill="#2563EB" />
+    <!-- Tassel -->
+    <path d="M0,-20 C5,-15 15,-20 20,-30" fill="none" stroke="#60A5FA" stroke-width="2" />
+    <circle cx="20" cy="-30" r="3" fill="#60A5FA" />
+  </g>
+  
+  <!-- Outer Ring with Glowing Effect -->
+  <circle cx="250" cy="250" r="180" fill="none" stroke="#334155" stroke-width="8" opacity="0.9" />
+  <circle cx="250" cy="250" r="180" fill="none" stroke="#60A5FA" stroke-width="2" opacity="0.8" filter="url(#glow)" />
+  
+  <!-- Scanning Effect -->
+  <circle cx="250" cy="250" r="170" fill="url(#scanGradient)" opacity="0.2" />
+  
+  <!-- Eye Iris with Enhanced Gradient -->
+  <circle cx="250" cy="250" r="150" fill="#1f2f54" />
+  <circle cx="250" cy="250" r="120" fill="url(#irisGradient)" />
+  
+  <!-- Knowledge Waves Emanating from Eye -->
+  <circle cx="250" cy="250" r="135" fill="none" stroke="url(#knowledgeGlow)" stroke-width="5" opacity="0.6">
+    <animate attributeName="r" values="135;150;135" dur="5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="5s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Pupil with Depth -->
+  <circle cx="250" cy="250" r="60" fill="#0F172A" />
+  <circle cx="250" cy="250" r="55" fill="#060A16" />
+  
+  <!-- Realistic Eye Highlights -->
+  <circle cx="300" cy="200" r="25" fill="white" opacity="0.9" />
+  <circle cx="310" cy="190" r="10" fill="white" />
+  <circle cx="220" cy="220" r="15" fill="white" opacity="0.5" />
+  <circle cx="230" cy="270" r="8" fill="white" opacity="0.3" />
+  
+  <!-- Git Network Structure - Enhanced with Document Icons -->
+  <g>
+    <!-- Network Background Glow -->
+    <g filter="url(#glow)">
+      <path d="M 130,130 L 250,250 L 370,370 M 250,250 L 370,130" 
+            stroke="#60A5FA" stroke-width="2" fill="none" opacity="0.5" />
+    </g>
+    
+    <!-- Main Network Structure with Gradient Stroke -->
+    <path d="M 130,130 L 250,250 L 370,370" 
+          stroke="url(#codePathGradient)" stroke-width="5" fill="none" stroke-linecap="round" />
+    <path d="M 250,250 L 370,130" 
+          stroke="url(#codePathGradient)" stroke-width="5" fill="none" stroke-linecap="round" />
+    
+    <!-- Connection Nodes with Document Icons -->
+    <!-- Node 1: Markdown Document -->
+    <circle cx="130" cy="130" r="14" fill="#2563EB">
+      <animate attributeName="r" values="14;16;14" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="130" cy="130" r="10" fill="#60A5FA" />
+    <!-- MD icon -->
+    <text x="123" y="134" font-family="monospace" font-size="12" fill="white" font-weight="bold">MD</text>
+    
+    <!-- Central Node: Main Hub -->
+    <circle cx="250" cy="250" r="16" fill="#2563EB">
+      <animate attributeName="r" values="16;18;16" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="250" cy="250" r="12" fill="#60A5FA" />
+    
+    <!-- Node 3: Documentation Icon -->
+    <circle cx="370" cy="130" r="14" fill="#2563EB">
+      <animate attributeName="r" values="14;16;14" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="370" cy="130" r="10" fill="#60A5FA" />
+    <!-- Document Icon -->
+    <g transform="translate(370, 130) scale(0.6)">
+      <path d="M-8,-8 L4,-8 L8,-4 L8,8 L-8,8 Z" fill="white" />
+      <path d="M4,-8 L4,-4 L8,-4" fill="none" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-5" y1="-3" x2="5" y2="-3" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-5" y1="0" x2="5" y2="0" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-5" y1="3" x2="5" y2="3" stroke="#60A5FA" stroke-width="1" />
+    </g>
+    
+    <!-- Node 4: Book Icon -->
+    <circle cx="370" cy="370" r="14" fill="#2563EB">
+      <animate attributeName="r" values="14;16;14" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="370" cy="370" r="10" fill="#60A5FA" />
+    <!-- Book Icon -->
+    <g transform="translate(370, 370) scale(0.6)">
+      <rect x="-8" y="-6" width="16" height="12" rx="1" fill="white" />
+      <line x1="0" y1="-6" x2="0" y2="6" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-6" y1="-3" x2="-2" y2="-3" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-6" y1="0" x2="-2" y2="0" stroke="#60A5FA" stroke-width="1" />
+      <line x1="-6" y1="3" x2="-2" y2="3" stroke="#60A5FA" stroke-width="1" />
+      <line x1="2" y1="-3" x2="6" y2="-3" stroke="#60A5FA" stroke-width="1" />
+      <line x1="2" y1="0" x2="6" y2="0" stroke="#60A5FA" stroke-width="1" />
+      <line x1="2" y1="3" x2="6" y2="3" stroke="#60A5FA" stroke-width="1" />
+    </g>
+  </g>
+  
+  <!-- Learning, Documentation & Knowledge Text References -->
+  <g font-family="sans-serif" font-size="7" fill="#60A5FA" opacity="0.6">
+    <text x="130" y="110">Markdown</text>
+    <text x="370" y="110">Documentation</text>
+    <text x="345" y="390">Learning</text>
+    <text x="250" y="300">Knowledge</text>
+  </g>
+  
+  <!-- Subtle Iris Animation - Breathing Effect -->
+  <circle cx="250" cy="250" r="120" fill="transparent" stroke="#60A5FA" stroke-width="3" opacity="0.3">
+    <animate attributeName="r" values="120;125;120" dur="4s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="4s" repeatCount="indefinite" />
+  </circle>
 </svg>
